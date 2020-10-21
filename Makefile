@@ -32,8 +32,17 @@ v4l2grab_userptr.o: v4l2grab.c
 
 	clang -c -I/usr/local/include -Wall -ansi -std=c99 -Werror -o v4l2grab_userptr.o v4l2grab.c -DIO_USERPTR
 
+test: v4l2grab_mmap v4l2grab_read v4l2grab_userptr
+
+	-./v4l2grab_mmap -o test_mmap.jpg
+	-./v4l2grab_read -o test_read.jpg
+	-./v4l2grab_userptr -o test_userptr.jpg
+
 clean:
 
-.PHONY: clean
+	rm *.o
+	rm *.jpg
+
+.PHONY: clean test
 
 	rm *.o
