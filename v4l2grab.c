@@ -62,7 +62,15 @@ struct buffer {
         size_t                  length;
 };
 
-static io_method        io              = IO_METHOD_MMAP;
+#if defined(IO_MMAP)
+ static io_method        io              = IO_METHOD_MMAP;
+#elif defined(IO_READ)
+ static io_method        io              = IO_METHOD_READ;
+#elif defined(IO_USERPTR)
+ static io_method        io              = IO_METHOD_USERPTR;
+#else
+ #error "No known I/O method supported"
+#endif
 static int              fd              = -1;
 struct buffer *         buffers         = NULL;
 static unsigned int     n_buffers       = 0;
@@ -589,7 +597,8 @@ static void userptrInit(unsigned int buffer_size)
 
   for (n_buffers = 0; n_buffers < 4; ++n_buffers) {
     buffers[n_buffers].length = buffer_size;
-    buffers[n_buffers].start = memalign (/* boundary */ page_size, buffer_size);
+    buffers[n_buffers].start = mmap(NULL, buffer_size, PROT_READ|PROT_WRITE, MAP_ANON, -1, 0);
+    // buffers[n_buffers].start = memalign (/* boundary */ page_size, buffer_size);
 
     if (!buffers[n_buffers].start) {
       fprintf(stderr, "Out of memory\n");
