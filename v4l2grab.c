@@ -39,7 +39,10 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-// #include <asm/types.h>
+#ifndef __FreeBSD__
+	#include <asm/types.h>
+	#include <malloc.h>
+#endif
 #include <linux/videodev2.h>
 #include <jpeglib.h>
 
@@ -597,8 +600,11 @@ static void userptrInit(unsigned int buffer_size)
 
   for (n_buffers = 0; n_buffers < 4; ++n_buffers) {
     buffers[n_buffers].length = buffer_size;
-    buffers[n_buffers].start = mmap(NULL, buffer_size, PROT_READ|PROT_WRITE, MAP_ANON, -1, 0);
-    // buffers[n_buffers].start = memalign (/* boundary */ page_size, buffer_size);
+    #ifdef __FreeBSD__
+        buffers[n_buffers].start = mmap(NULL, buffer_size, PROT_READ|PROT_WRITE, MAP_ANON, -1, 0);
+    #else
+        buffers[n_buffers].start = memalign (/* boundary */ page_size, buffer_size);
+    #endif
 
     if (!buffers[n_buffers].start) {
       fprintf(stderr, "Out of memory\n");
