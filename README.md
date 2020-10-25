@@ -6,3 +6,5 @@ I've created this local fork just to learn how to decode
 webcam frames (truncated motion JPEG using default tables)
 using libjpeg - and "porting" this utility to FreeBSD by
 applying some minor fixes.
+
+Note that currently only ```mmap``` method works under FreeBSD
